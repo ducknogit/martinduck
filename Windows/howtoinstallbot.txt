@@ -1,0 +1,2 @@
+https://github.com/amchess/ShashChess/releases/tag/40
+download and unzip here
