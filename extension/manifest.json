@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Martin Duck",
+  "version": "1.0",
+  "description": "skibidi bot",
+  "permissions": [],
+  "host_permissions": [
+    "https://www.chess.com/*",
+    "http://localhost:3667/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.chess.com/play/*",
+        "https://www.chess.com/game/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end",
+      "world": "MAIN"
+    }
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
