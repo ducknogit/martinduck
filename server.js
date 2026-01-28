@@ -12,7 +12,8 @@ app.use(express.json());
 
 const ENGINE_PATH = path.join(__dirname, 'Windows', 'ShashChess40-x86-64.exe');
 
-function analyzePosition(fen) {
+// Phân tích vị trí - AGGRESSIVE & WINNING STYLE
+function analyzePosition(fen, limit = 4) { // Added limit param
   return new Promise((resolve, reject) => {
     const engine = spawn(ENGINE_PATH);
     const moves = [];
@@ -25,48 +26,48 @@ function analyzePosition(fen) {
 
     engine.stdout.on('data', (data) => {
       const lines = data.toString().split('\n');
-
+      
       lines.forEach((line) => {
         line = line.trim();
         if (!line) return;
-
+        
         if (line.includes('uciok')) {
           const threads = os.cpus().length;
           engine.stdin.write(`setoption name Threads value ${threads}\n`);
           engine.stdin.write(`setoption name Hash value 1024\n`);
-
-          engine.stdin.write(`setoption name Contempt value 20\n`); 
-
-          engine.stdin.write(`setoption name Aggressiveness value 200\n`); 
-
-          engine.stdin.write(`setoption name MultiPV value 8\n`);
+          // AGGRESSIVE SETTINGS
+          engine.stdin.write(`setoption name Contempt value 20\n`); // Ưu tiên thắng > hòa
+          engine.stdin.write(`setoption name Aggressiveness value 200\n`); // Công hơn thủ
+          // Smart MultiPV: If we only need 1 move, set MultiPV to 1 for max strength/speed
+          const multiPV = limit === 1 ? 1 : 8; 
+          engine.stdin.write(`setoption name MultiPV value ${multiPV}\n`);
           engine.stdin.write('isready\n');
         }
-
+        
         if (line.includes('readyok')) {
           engine.stdin.write(`position fen ${fen}\n`);
           engine.stdin.write('go movetime 1000\n');
         }
-
+        
         if (line.startsWith('info') && line.includes('multipv')) {
           const multipvMatch = line.match(/multipv (\d+)/);
           const scoreMatch = line.match(/score cp (-?\d+)/);
           const mateMatch = line.match(/score mate (-?\d+)/);
           const pvMatch = line.match(/\spv\s+(.+)$/);
-
+          
           if (multipvMatch && pvMatch) {
             const pvIndex = parseInt(multipvMatch[1]) - 1;
             const pvMoves = pvMatch[1].trim().split(' ');
-
+            
             let scoreCP;
             if (mateMatch) {
               scoreCP = parseInt(mateMatch[1]) > 0 ? 10000 : -10000;
             } else if (scoreMatch) {
               scoreCP = parseInt(scoreMatch[1]);
             }
-
+            
             if (pvIndex === 0) bestScore = scoreCP;
-
+            
             moves[pvIndex] = {
               move: pvMoves[0],
               pv: pvMoves,
@@ -75,31 +76,30 @@ function analyzePosition(fen) {
             };
           }
         }
-
+        
         if (line.startsWith('bestmove')) {
           clearTimeout(timeout);
           engine.kill();
-
+          
           const validMoves = moves.filter(m => m && m.scoreCP !== undefined);
           const filtered = validMoves.filter(m => {
             const diff = Math.abs(bestScore - m.scoreCP);
             return diff <= 50;
           });
-
+          
+          // NEW QUALITY SYSTEM
           const withQuality = filtered.map(m => {
             const diff = Math.abs(bestScore - m.scoreCP);
             let quality;
-            if (diff <= 5) quality = 'Goodest';      
-
-            else if (diff <= 25) quality = 'Excellent'; 
-
-            else quality = 'OK';                        
-
+            if (diff <= 5) quality = 'Goodest';      // Thiên tài
+            else if (diff <= 25) quality = 'Excellent'; // Tốt
+            else quality = 'OK';                        // Tạm được
+            
             return { ...m, quality };
           });
-
-          const finalMoves = withQuality.slice(0, 4);
-
+          
+          const finalMoves = withQuality.slice(0, limit); // Respect limit
+          
           resolve({
             moves: finalMoves,
             evaluation: bestScore,
@@ -110,7 +110,7 @@ function analyzePosition(fen) {
     });
 
     engine.stderr.on('data', (data) => {
-
+      // Silent
     });
 
     engine.on('error', (error) => {
@@ -122,18 +122,20 @@ function analyzePosition(fen) {
   });
 }
 
+// API endpoint
 app.post('/analyze', async (req, res) => {
   try {
-    const { fen } = req.body;
-
+    const { fen, limit } = req.body;
+    
     if (!fen) {
       return res.status(400).json({ 
         error: 'Missing FEN string' 
       });
     }
-
-    const result = await analyzePosition(fen);
-
+    
+    const moveLimit = limit ? parseInt(limit) : 4;
+    const result = await analyzePosition(fen, moveLimit);
+    
     res.json({
       success: true,
       fen: fen,
@@ -141,7 +143,7 @@ app.post('/analyze', async (req, res) => {
       evaluation: result.evaluation,
       evaluationPawns: result.evaluationPawns
     });
-
+    
   } catch (error) {
     res.status(500).json({ 
       error: 'Analysis failed',
@@ -182,8 +184,7 @@ app.listen(PORT, () => {
   console.log(' $$$$$$$/   $$$$$$/   $$$$$$$/ $$/   $$/                  ');
   console.log('\n                    With ShashChess 40 Engine');
   console.log('                           Running !!\n');
-
+  
   console.log(`Threads: ${os.cpus().length} cores | Hash: 1024 MB | Speed: 1s`);
   console.log(`Quality: Goodest ≤5cp | Excellent ≤25cp | OK ≤50cp\n`);
 });
-

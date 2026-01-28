@@ -11,8 +11,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://www.chess.com/play/*",
-        "https://www.chess.com/game/*"
+        "https://www.chess.com/*"
+        
       ],
       "js": ["content.js"],
       "run_at": "document_end",
