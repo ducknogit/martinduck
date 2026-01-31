@@ -1,0 +1,18 @@
+.evaluationBar {
+    position: relative;
+    min-width: 42px;
+    height: 100%;
+}
+
+.overBar {
+    width: 100%;
+
+    transition: height 0.5s ease-out
+}
+
+.evaluationText {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+}

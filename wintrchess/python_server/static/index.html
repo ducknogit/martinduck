@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wintrchess Python Analysis</title>
+  <link rel="stylesheet" href="/static/lib/chessboard.min.css" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>Wintrchess (Python)</h1>
+      <p>Paste PGN, pick depth/time, and analyze with ShashChess 40 backend.</p>
+    </header>
+
+    <section class="controls">
+      <label>PGN</label>
+      <textarea id="pgn" placeholder="Paste PGN here"></textarea>
+      <div class="row">
+        <label>MultiPV
+          <select id="multipv">
+            <option value="1">1</option>
+            <option value="3" selected>3</option>
+            <option value="5">5</option>
+          </select>
+        </label>
+        <label>Move time (ms)
+          <input id="movetime" type="number" value="1500" min="200" step="100">
+        </label>
+        <label>Target ply (optional)
+          <input id="ply" type="number" min="0" placeholder="last">
+        </label>
+        <button id="analyze">Analyze</button>
+      </div>
+      <div class="progress">
+        <div id="progressBar"></div>
+      </div>
+      <div id="status" class="muted">Idle</div>
+    </section>
+
+    <section class="layout">
+      <div id="board" class="board"></div>
+      <div class="panel">
+        <h3>Lines</h3>
+        <div id="lines"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Use non-module globals to avoid 'export' errors -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="/static/lib/jquery-3.7.1.min.js"></script>
+  <script src="/static/lib/chessboard.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

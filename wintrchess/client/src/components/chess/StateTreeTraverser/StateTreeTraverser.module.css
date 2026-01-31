@@ -1,0 +1,36 @@
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    gap: 8px;
+    padding: 8px 10px;
+    z-index: 2;
+
+    background-color: #1f1f1f;
+    border-radius: 12px;
+    border: 1px solid #2b2b2b;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: #2a2a2a;
+    border: 1px solid #333;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.12s ease, border 0.12s ease;
+}
+
+.btn:hover {
+    background: #323232;
+    border-color: #3a3a3a;
+    transform: translateY(-1px);
+}
+
+.btn svg {
+    fill: #e6e6e6;
+}

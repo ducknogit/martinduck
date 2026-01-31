@@ -1,25 +1,15 @@
-(function() {
+(function () {
     'use strict';
 
     const API_URL = 'http://localhost:3667/analyze';
-    
-    // Check if on game page
-    const isGamePage = window.location.pathname.includes('/play') || 
-                       window.location.pathname.includes('/game');
-    
-    console.log('🦆 Martin Duck: Checking page...', window.location.pathname);
-    console.log('🦆 Is game page?', isGamePage);
-    
+
+    const isGamePage = window.location.pathname.includes('/play') ||
+        window.location.pathname.includes('/game');
     if (!isGamePage) {
-        console.log('🦆 Not a game page, exiting');
         return;
     }
 
-    console.log('🦆 Creating UI...');
 
-    // ==========================================
-    // 1. STATE MANAGEMENT
-    // ==========================================
     let isMinimized = false;
     let isMaximized = false;
     let windowState = { x: null, y: null, width: 320, height: 150 };
@@ -27,16 +17,12 @@
     let lastProcessedFen = null;
     let isGameOver = false;
 
-    // ==========================================
-    // 2. HELPER FUNCTIONS
-    // ==========================================
-
     function loadUIState() {
         const saved = localStorage.getItem('martinDuckUIState');
         if (saved) {
             try {
                 return JSON.parse(saved);
-            } catch (e) {}
+            } catch (e) { }
         }
         return null;
     }
@@ -58,7 +44,7 @@
         const content = document.getElementById('martin-duck-content');
         const mainWindow = document.getElementById('martin-duck-window');
         if (!content || !mainWindow) return;
-        
+
         isMinimized = !isMinimized;
         content.style.display = isMinimized ? 'none' : 'flex';
         mainWindow.style.height = isMinimized ? 'auto' : (windowState.height + 'px');
@@ -115,7 +101,7 @@
                 'bottom-right': { bottom: '0', right: '0', cursor: 'nwse-resize' }
             };
             resizer.style.cssText = `position: absolute; width: 12px; height: 12px; ${positions[corner].top ? `top: ${positions[corner].top};` : ''} ${positions[corner].bottom ? `bottom: ${positions[corner].bottom};` : ''} ${positions[corner].left ? `left: ${positions[corner].left};` : ''} ${positions[corner].right ? `right: ${positions[corner].right};` : ''} cursor: ${positions[corner].cursor}; z-index: 10;`;
-            
+
             resizer.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -125,7 +111,7 @@
                 const startHeight = element.offsetHeight;
                 const startLeft = element.offsetLeft;
                 const startTop = element.offsetTop;
-                
+
                 function resize(e) {
                     const deltaX = e.clientX - startX;
                     const deltaY = e.clientY - startY;
@@ -148,7 +134,7 @@
                     windowState.width = element.offsetWidth;
                     windowState.height = element.offsetHeight;
                 }
-                
+
                 function stopResize() {
                     document.removeEventListener('mousemove', resize);
                     document.removeEventListener('mouseup', stopResize);
@@ -189,7 +175,7 @@
                 const fen = parseBoardToFEN(board);
                 if (fen) return fen;
             }
-        } catch (e) {}
+        } catch (e) { }
         return null;
     }
 
@@ -199,8 +185,8 @@
             if (!board) return 'white';
             try {
                 const playerBottom = document.querySelector('.player-component.player-bottom, .player-bottom');
-                if (playerBottom && playerBottom.textContent?.toLowerCase().includes('you')) {}
-            } catch (e) {}
+                if (playerBottom && playerBottom.textContent?.toLowerCase().includes('you')) { }
+            } catch (e) { }
             if (board.game) {
                 if (typeof board.game.getPlayingAs === 'function') {
                     const color = board.game.getPlayingAs();
@@ -224,7 +210,7 @@
                 if (typeof board.game.markDirty === 'function') board.game.markDirty();
                 if (typeof board.game.draw === 'function') board.game.draw();
             }
-        } catch (error) {}
+        } catch (error) { }
     }
 
     function handlePromotion(piece) {
@@ -236,7 +222,7 @@
                 if (targetPiece) {
                     targetPiece.click();
                     const rect = targetPiece.getBoundingClientRect();
-                    const commonOptions = { bubbles: true, cancelable: true, view: window, clientX: rect.left + rect.width/2, clientY: rect.top + rect.height/2, button: 0, buttons: 1 };
+                    const commonOptions = { bubbles: true, cancelable: true, view: window, clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2, button: 0, buttons: 1 };
                     targetPiece.dispatchEvent(new PointerEvent('pointerdown', commonOptions));
                     targetPiece.dispatchEvent(new MouseEvent('mousedown', commonOptions));
                     targetPiece.dispatchEvent(new PointerEvent('pointerup', { ...commonOptions, buttons: 0 }));
@@ -279,7 +265,6 @@
             const fromY = rect.top + fromPixel.y;
             const toX = rect.left + toPixel.x;
             const toY = rect.top + toPixel.y;
-            console.log(`🦆 interaction: ${from}→${to}`);
             const targetFrom = document.elementFromPoint(fromX, fromY);
             if (!targetFrom) return false;
 
@@ -290,7 +275,7 @@
             targetFrom.dispatchEvent(new PointerEvent('pointerup', { ...commonOptions, clientX: fromX, clientY: fromY, buttons: 0 }));
             targetFrom.dispatchEvent(new MouseEvent('mouseup', { ...commonOptions, clientX: fromX, clientY: fromY, buttons: 0 }));
             targetFrom.dispatchEvent(new MouseEvent('click', { ...commonOptions, clientX: fromX, clientY: fromY, buttons: 0 }));
-            
+
             setTimeout(() => {
                 const targetTo = document.elementFromPoint(toX, toY);
                 if (targetTo) {
@@ -308,13 +293,10 @@
 
     function executeMove(from, to, promotion = null) {
         try {
-            console.log('🦆 executeMove: Starting', from, '→', to, promotion ? `(promo: ${promotion})` : '');
             const board = document.querySelector('.board, wc-chess-board, chess-board');
             if (!board) return false;
-            console.log('🦆 executeMove: Using pure pixel-click method...');
             const result = executePixelClick(board, from, to, promotion);
             if (result) {
-                console.log('🦆 executeMove: Pixel interaction sequence initiated');
                 return true;
             }
             return false;
@@ -345,7 +327,7 @@
             const p1 = squareToPixel(from, size, isFlipped);
             const p2 = squareToPixel(to, size, isFlipped);
             const squareSize = size / 8;
-            const isCastling = ['e1g1','e1c1','e8g8','e8c8'].includes(from+to);
+            const isCastling = ['e1g1', 'e1c1', 'e8g8', 'e8c8'].includes(from + to);
             if (isCastling) {
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 path.setAttribute('d', `M ${p1.x},${p1.y} L ${p2.x},${p1.y} L ${p2.x},${p2.y}`);
@@ -418,7 +400,7 @@
                     return el.getAttribute('data-fen') || el.getAttribute('fen');
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
         return null;
     }
 
@@ -441,7 +423,7 @@
                 const siblingResult = findFENInFiber(fiber.sibling, depth + 1);
                 if (siblingResult) return siblingResult;
             }
-        } catch (e) {}
+        } catch (e) { }
         return null;
     }
 
@@ -484,10 +466,6 @@
         return null;
     }
 
-    // ==========================================
-    // 3. MAIN ANALYSIS LOGIC
-    // ==========================================
-
     async function analyze() {
         const originalText = document.querySelector('#martin-duck-content button').textContent;
         const btn = document.querySelector('#martin-duck-content button');
@@ -527,7 +505,6 @@
     }
 
     function startAutoLoop() {
-        console.log('🦆 AutoLoop: Starting...');
         isGameOver = false;
         if (mainInterval) clearInterval(mainInterval);
 
@@ -536,7 +513,6 @@
             const isAutoCheck = document.getElementById('auto-check-checkbox')?.checked;
 
             if (!isAutoMove && !isAutoCheck) {
-                console.log('🦆 AutoLoop: Stopped (both unchecked)');
                 clearInterval(mainInterval);
                 mainInterval = null;
                 return;
@@ -549,11 +525,11 @@
             const playerColor = getPlayerColor();
             const fenParts = fen.split(' ');
             const turnColor = fenParts[1];
-            const isMyTurn = (playerColor === 'white' && turnColor === 'w') || 
-                            (playerColor === 'black' && turnColor === 'b');
+            const isMyTurn = (playerColor === 'white' && turnColor === 'w') ||
+                (playerColor === 'black' && turnColor === 'b');
 
             if (!isMyTurn) {
-                if (Math.random() > 0.8) { 
+                if (Math.random() > 0.8) {
                     const board = document.querySelector('.board, wc-chess-board, chess-board');
                     if (board) triggerBoardUpdate(board);
                 }
@@ -561,28 +537,25 @@
             }
 
             if (fen === lastProcessedFen) {
-                // Check if we are stuck (same FEN for > 3.5 seconds but still my turn)
-                // This handles cases where click failed or network lagged
+
                 if (!window.lastAttemptTime) window.lastAttemptTime = Date.now();
-                
+
                 if (Date.now() - window.lastAttemptTime > 3500) {
-                    console.log('🦆 AutoLoop: Move seems stuck (3.5s), retrying...');
-                    window.lastAttemptTime = Date.now(); // Reset timer
-                    lastProcessedFen = null; // Force retry in next tick
+                    window.lastAttemptTime = Date.now(); 
+                    lastProcessedFen = null; 
+
                 }
                 return;
             }
-            
-            window.lastAttemptTime = Date.now(); // Record new attempt start
+
+            window.lastAttemptTime = Date.now(); 
 
             const delay = Math.floor(Math.random() * 800) + 500;
             const currentFenForDelay = fen;
-            
+
             setTimeout(async () => {
                 try {
                     if (getFEN() !== currentFenForDelay) return;
-                    console.log('🦆 AutoLoop: My turn! Analyzing...');
-                    
                     const oldSvg = document.getElementById('arrows-svg');
                     if (oldSvg) oldSvg.remove();
 
@@ -592,10 +565,10 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ fen, limit })
                     });
-    
+
                     if (!response.ok) return;
                     const data = await response.json();
-                    
+
                     if (data.success && data.bestMoves && data.bestMoves.length > 0) {
                         let movesToProcess = data.bestMoves;
                         if (isAutoMove) movesToProcess = [data.bestMoves[0]];
@@ -604,41 +577,36 @@
                             drawArrows(movesToProcess);
                             showMoveList(movesToProcess);
                         }
-    
+
                         if (isAutoMove) {
                             const bestMove = movesToProcess[0].move;
                             if (bestMove && bestMove.length >= 4) {
                                 const from = bestMove.substring(0, 2);
                                 const to = bestMove.substring(2, 4);
                                 const promotion = bestMove.length === 5 ? bestMove[4] : null;
-                                console.log('🦆 AutoMove: Executing', from, '→', to);
+                                
                                 if (executeMove(from, to, promotion)) {
-                                    // Success
+
                                 }
                             }
                         } else {
-                            // Only AutoCheck
+
                             lastProcessedFen = fen;
                         }
                     }
                 } catch (error) {
-                    console.log('🦆 AutoLoop: Error:', error);
+                    
                 }
             }, delay);
             lastProcessedFen = fen;
         }, 1000);
     }
 
-    // ==========================================
-    // 4. UI CREATION & EVENT LISTENERS
-    // ==========================================
-
-    console.log('🦆 Creating UI Elements...');
     const savedState = loadUIState();
     const initTop = savedState?.y || '80px';
     const initLeft = savedState?.x || null;
     const initWidth = savedState?.width || 320;
-    const initHeight = savedState?.height || 150;
+    const initHeight = savedState?.height || 250;
 
     const mainWindow = document.createElement('div');
     mainWindow.id = 'martin-duck-window';
@@ -676,13 +644,27 @@
     checkBtn.onmouseout = () => checkBtn.style.background = '#81b64c';
     checkBtn.onclick = analyze;
 
+    const analysisBtn = document.createElement('button');
+    analysisBtn.textContent = 'Analysis';
+    analysisBtn.style.cssText = `background: #b58863; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; transition: background 0.2s;`;
+    analysisBtn.onmouseover = () => analysisBtn.style.background = '#a07855';
+    analysisBtn.onmouseout = () => analysisBtn.style.background = '#b58863';
+    analysisBtn.onclick = async () => {
+        try {
+            await fetch('http://localhost:3667/start-analysis', { method: 'POST' });
+            window.open('http://localhost:3667', '_blank');
+        } catch (e) {
+            alert('Cannot connect to backend (localhost:3667)');
+        }
+    };
+
     const autoMoveContainer = document.createElement('div');
     autoMoveContainer.style.cssText = `display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 4px;`;
     const autoMoveCheckbox = document.createElement('input');
     autoMoveCheckbox.type = 'checkbox';
     autoMoveCheckbox.id = 'auto-move-checkbox';
     autoMoveCheckbox.style.cssText = `width: 18px; height: 18px; cursor: pointer;`;
-    
+
     function showAutoMoveWarningDialog() {
         const overlay = document.createElement('div');
         overlay.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999999; display: flex; align-items: center; justify-content: center;`;
@@ -699,7 +681,7 @@
         okBtn.onclick = () => { overlay.remove(); showConfirmDialog(); };
         dialog.appendChild(title); dialog.appendChild(message); dialog.appendChild(okBtn); overlay.appendChild(dialog); document.body.appendChild(overlay);
     }
-    
+
     function showConfirmDialog() {
         const overlay = document.createElement('div');
         overlay.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999999; display: flex; align-items: center; justify-content: center;`;
@@ -743,7 +725,7 @@
     autoCheckCheckbox.type = 'checkbox';
     autoCheckCheckbox.id = 'auto-check-checkbox';
     autoCheckCheckbox.style.cssText = `width: 18px; height: 18px; cursor: pointer;`;
-    
+
     function showAutoCheckWarningDialog1() {
         const overlay = document.createElement('div');
         overlay.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999999; display: flex; align-items: center; justify-content: center;`;
@@ -760,7 +742,7 @@
         okBtn.onclick = () => { localStorage.setItem('martinDuckAutoCheckWarningStep1', 'true'); overlay.remove(); showAutoCheckConfirmDialog(); };
         dialog.appendChild(title); dialog.appendChild(message); dialog.appendChild(okBtn); overlay.appendChild(dialog); document.body.appendChild(overlay);
     }
-    
+
     function showAutoCheckConfirmDialog() {
         const overlay = document.createElement('div');
         overlay.style.cssText = `position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999999; display: flex; align-items: center; justify-content: center;`;
@@ -805,8 +787,9 @@
     moveListContainer.style.cssText = `margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 120px; overflow-y: auto; display: none;`;
 
     content.appendChild(checkBtn);
-    content.appendChild(autoCheckContainer);
+    content.appendChild(analysisBtn);
     content.appendChild(autoMoveContainer);
+    content.appendChild(autoCheckContainer);
     content.appendChild(moveListContainer);
 
     mainWindow.appendChild(titleBar);
@@ -815,8 +798,7 @@
 
     makeDraggable(titleBar, mainWindow);
     makeResizable(mainWindow);
-    
-    // Keyboard shortcut
+
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.shiftKey && e.key === 'A') {
             e.preventDefault();
@@ -824,7 +806,6 @@
         }
     });
 
-    // Check if window should be hidden
     if (localStorage.getItem('martinDuckWindowClosed') === 'true') {
         mainWindow.style.display = 'none';
         document.addEventListener('keydown', (e) => {
@@ -832,5 +813,4 @@
         });
     }
 
-    console.log('🦆 Martin Duck Extension fully loaded!');
 })();

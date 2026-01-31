@@ -1,0 +1,22 @@
+.board {
+    flex-grow: 0;
+    width: max-content;
+    min-width: 0;
+    max-width: 1180px;
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .board {
+        width: 100%;
+        max-width: 760px;
+    }
+}
+
+@media (max-width: 500px) {
+    .boardProfile {
+        width: 100%;
+
+        border-radius: 0 !important;
+    }
+}

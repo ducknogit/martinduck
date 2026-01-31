@@ -1,0 +1,71 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: max-content;
+    max-width: 100%;
+    overflow: visible;
+}
+
+.profile {
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 15px;
+    box-sizing: border-box;
+    min-width: 130px;
+    width: max-content;
+    max-width: 100%;
+    margin: 0 0 6px 0;
+    min-height: 55px;
+
+    background-color: var(--ui-shade-3);
+}
+
+.boardContainer {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: max-content;
+    max-width: 100%;
+    overflow: visible;
+}
+
+.boardInner {
+    display: block;
+    flex-shrink: 0;
+}
+
+.evalBarWrap {
+    position: relative;
+    left: auto;
+    top: auto;
+    bottom: auto;
+    width: 44px;
+    margin-right: 8px;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 5;
+    flex-shrink: 0;
+}
+
+:global(.react-chessboard-piece),
+:global(.react-chessboard-piece.dragging) {
+    transform: translate(-50%, -50%) scale(1) !important;
+}
+
+:global(.react-dnd-html5-backend-layer img),
+:global(.react-dnd-html5-backend-layer svg) {
+    transform: translate(-50%, -50%) scale(0.6) !important;
+    width: 60% !important;
+    height: 60% !important;
+    object-fit: contain !important;
+}
+
+:global(.react-dnd-html5-backend-layer > *) {
+    transform-origin: center center !important;
+}

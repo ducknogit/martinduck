@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Analyse your Chess games, free of charge.">
+
+    <meta name="og:title" content="♟️ WintrChess - Analysis">
+    <meta name="og:url" content="https://wintrchess.com/">
+    <meta name="og:image" content="/img/logo.svg">
+    <meta name="og:description" content="Analyse Chess games for free.">
+    <meta name="theme-color" content="#47acff">
+
+    <link rel="icon" href="/favicon.ico">
+
+    <title>Game Analysis</title>
+
+    <!-- ads removed for local deployment -->
+    <script>
+      // Minimal client error logging to Flask
+      (function() {
+        const endpoint = "/client-log";
+        function send(payload) {
+          try {
+            navigator.sendBeacon(endpoint, JSON.stringify(payload));
+          } catch {
+            fetch(endpoint, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)});
+          }
+        }
+        window.addEventListener("error", function(e) {
+          send({type: "error", message: e.message, source: e.filename, line: e.lineno, col: e.colno});
+        });
+        window.addEventListener("unhandledrejection", function(e) {
+          send({type: "unhandledrejection", reason: (e.reason && e.reason.message) || String(e.reason)});
+        });
+        const origConsoleError = console.error;
+        console.error = function(...args) {
+          send({type: "console.error", args: args.map(String)});
+          origConsoleError.apply(console, args);
+        };
+        send({type: "page-load", at: Date.now()});
+      })();
+    </script>
+</head>
+<body>
+    <div class="root"></div>
+
+    <script src="/analysis.bundle.js"></script>
+</body>
+</html>
