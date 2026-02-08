@@ -15,6 +15,14 @@ function Analysis() {
             <div className={styles.heroSubtitle}>
                 base on https://github.com/WintrCat/wintrchess
             </div>
+            <a
+                href="https://www.chess.com/play"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.chessComBtn}
+            >
+                Chess.com
+            </a>
         </header>
 
         <div className={styles.analysisSection}>

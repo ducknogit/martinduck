@@ -19,12 +19,15 @@ if (BoardCtor) {
   });
 }
 
+const progressText = document.getElementById("progressText");
+
 function setStatus(text) {
   statusEl.textContent = text;
 }
 
 function setProgress(percent) {
   progressBar.style.width = `${percent}%`;
+  progressText.textContent = percent > 0 ? `${Math.round(percent)}%` : '';
 }
 
 function renderLines(fen, lines) {

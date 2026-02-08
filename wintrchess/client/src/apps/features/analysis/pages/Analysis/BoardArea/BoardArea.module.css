@@ -19,4 +19,8 @@
 
         border-radius: 0 !important;
     }
+
+    .board {
+        max-width: 100vw;
+    }
 }

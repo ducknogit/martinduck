@@ -1,0 +1,12 @@
+{
+  "name": "cordova-plugin-shashchess",
+  "version": "1.0.0",
+  "description": "ShashChess engine plugin",
+  "cordova": {
+    "id": "cordova-plugin-shashchess",
+    "platforms": ["android"]
+  },
+  "keywords": ["cordova", "shashchess", "engine"],
+  "engines": [ { "name": "cordova", "version": ">=11" } ]
+}
+

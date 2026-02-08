@@ -56,7 +56,6 @@ function EvaluationBar({
         <span
             className={styles.evaluationText}
             style={{
-                [textBottom ? "bottom" : "top"]: "7px",
                 color: overBarHeight > 50 ? "#fff" : "#000"
             }}
         >

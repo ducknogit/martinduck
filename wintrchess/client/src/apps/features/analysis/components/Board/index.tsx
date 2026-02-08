@@ -117,10 +117,10 @@ function Board({
         );
 
         const target = availableWidth
-            ? Math.min(Math.max(availableWidth, 520), viewportBound)
+            ? Math.min(Math.max(availableWidth, 280), viewportBound)
             : viewportBound;
 
-        return Math.max(Math.min(target, 1180), 520);
+        return Math.max(Math.min(target, 1180), 280);
     }, [availableWidth, windowHeight]);
 
     useEffect(() => {
@@ -217,7 +217,10 @@ function Board({
         >
             <div
                 className={styles.evalBarWrap}
-                style={{ height: `${boardWidth}px` }}
+                style={{
+                    height: `${boardWidth}px`,
+                    width: '11px'
+                }}
             >
                 <EvaluationBar
                     evaluation={evalData}

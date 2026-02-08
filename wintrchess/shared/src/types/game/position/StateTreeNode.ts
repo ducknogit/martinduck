@@ -6,16 +6,23 @@ import { boardStateSchema } from "./BoardState";
 import PieceColour from "@/constants/PieceColour";
 import { pickEngineLines } from "./EngineLine";
 
-export const stateTreeNodeSchema = z.object({
+// Base schema without recursive fields
+const baseStateTreeNodeSchema = z.object({
     id: z.string(),
     mainline: z.boolean(),
-    state: boardStateSchema,
-    get children(): z.ZodArray<typeof stateTreeNodeSchema> {
-        return stateTreeNodeSchema.array();
-    },
-    get parent(): z.ZodOptional<typeof stateTreeNodeSchema> {
-        return stateTreeNodeSchema.optional();
-    }
+    state: boardStateSchema
+});
+
+// Define the recursive schema type explicitly
+type StateTreeNodeSchema = z.infer<typeof baseStateTreeNodeSchema> & {
+    children: StateTreeNodeSchema[];
+    parent?: StateTreeNodeSchema;
+};
+
+// Full schema using z.lazy() for recursive fields
+export const stateTreeNodeSchema: z.ZodType<StateTreeNodeSchema> = baseStateTreeNodeSchema.extend({
+    children: z.lazy(() => stateTreeNodeSchema.array()),
+    parent: z.lazy(() => stateTreeNodeSchema).optional()
 });
 
 export type StateTreeNode = z.infer<typeof stateTreeNodeSchema>;
@@ -146,7 +153,7 @@ export function getNodeChain(
 
         for (const child of current.children) {
             frontier.push(child);
-            
+
             if (!expand) break;
         }
     }
@@ -183,7 +190,7 @@ export function getNodeMoveNumber(
 
     if (initialPosition) {
         const board = new Chess(initialPosition);
-    
+
         initialMoveNumber = board.moveNumber()
             + (board.turn() == "b" ? 0.5 : 0);
     }
@@ -219,7 +226,7 @@ export function addChildMove(node: StateTreeNode, san: string) {
     const existingNode = node.children.find(
         child => child.state.move?.san == san
     );
-    
+
     const childMove = new Chess(node.state.fen).move(san);
 
     const createdNode: StateTreeNode = {

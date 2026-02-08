@@ -1,0 +1,36 @@
+{
+  "name": "martinduck",
+  "displayName": "Hello Cordova",
+  "version": "1.0.0",
+  "description": "A sample Apache Cordova application that responds to the deviceready event.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Apache Cordova Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cordova-android": "^14.0.1",
+    "cordova-plugin-file": "^8.1.3",
+    "cordova-plugin-inappbrowser": "^6.0.0",
+    "cordova-plugin-shashchess": "file:../../cordova-plugin-shashchess"
+  },
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-inappbrowser": {},
+      "cordova-plugin-shashchess": {},
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      }
+    },
+    "platforms": [
+      "android"
+    ]
+  },
+  "dependencies": {
+    "stockfish": "^17.1.0"
+  }
+}

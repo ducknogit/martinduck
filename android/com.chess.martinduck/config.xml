@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.chess.martinduck" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>MartinDuck</name>
+    <description>
+        toilet chess
+    </description>
+    <author email="liminhomgamer@gmail.com" href="https://chess.com">
+        Martin Duck
+    </author>
+    <content src="index.html" />
+    <icon src="icon.jpg" />
+    <allow-navigation href="*" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <preference name="MixedContentMode" value="0" />
+    <preference name="android-minSdkVersion" value="22" />
+    <preference name="android-targetSdkVersion" value="35" />
+    <platform name="android">
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+            <application android:usesCleartextTraffic="true" android:networkSecurityConfig="@xml/network_security_config" />
+        </edit-config>
+        <resource-file src="res/xml/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
+    </platform>
+</widget>

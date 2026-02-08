@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<plugin id="cordova-plugin-shashchess" version="1.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>ShashChessEngine</name>
+    <platform name="android">
+        <source-file src="src/android/ShashChessEngine.java" target-dir="src/com/chess/martinduck/shashchess" />
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="ShashEngine">
+                <param name="android-package" value="com.chess.martinduck.shashchess.ShashChessEngine" />
+            </feature>
+        </config-file>
+        <resource-file src="src/android/shashchess40" target="app/src/main/assets/shashchess/shashchess40" />
+        <source-file src="src/android/arm64-v8a/libshashchess40.so" target-dir="app/src/main/jniLibs/arm64-v8a" />
+    </platform>
+</plugin>

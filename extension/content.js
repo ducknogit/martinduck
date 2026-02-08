@@ -12,10 +12,12 @@
 
     let isMinimized = false;
     let isMaximized = false;
-    let windowState = { x: null, y: null, width: 320, height: 150 };
+    const DEFAULT_HEIGHT = 420;
+    let windowState = { x: null, y: null, width: 320, height: DEFAULT_HEIGHT };
     let mainInterval = null;
     let lastProcessedFen = null;
     let isGameOver = false;
+    let lastArrowFen = null;
 
     function loadUIState() {
         const saved = localStorage.getItem('martinDuckUIState');
@@ -123,10 +125,10 @@
                             element.style.left = (startLeft + deltaX) + 'px';
                         }
                     }
-                    if (corner.includes('bottom')) element.style.height = Math.max(120, startHeight + deltaY) + 'px';
+                    if (corner.includes('bottom')) element.style.height = Math.max(240, startHeight + deltaY) + 'px';
                     if (corner.includes('top')) {
-                        const newHeight = Math.max(120, startHeight - deltaY);
-                        if (newHeight >= 120) {
+                        const newHeight = Math.max(240, startHeight - deltaY);
+                        if (newHeight >= 240) {
                             element.style.height = newHeight + 'px';
                             element.style.top = (startTop + deltaY) + 'px';
                         }
@@ -371,6 +373,15 @@
             svg.appendChild(triangle);
         });
         board.appendChild(svg);
+        lastArrowFen = getFEN();
+    }
+
+    function clearArrowsAndList() {
+        const oldSvg = document.getElementById('arrows-svg');
+        if (oldSvg) oldSvg.remove();
+        const list = document.getElementById('martin-duck-moves');
+        if (list) list.style.display = 'none';
+        lastArrowFen = null;
     }
 
     function showMoveList(moves) {
@@ -529,6 +540,7 @@
                 (playerColor === 'black' && turnColor === 'b');
 
             if (!isMyTurn) {
+                clearArrowsAndList();
                 if (Math.random() > 0.8) {
                     const board = document.querySelector('.board, wc-chess-board, chess-board');
                     if (board) triggerBoardUpdate(board);
@@ -606,11 +618,13 @@
     const initTop = savedState?.y || '80px';
     const initLeft = savedState?.x || null;
     const initWidth = savedState?.width || 320;
-    const initHeight = savedState?.height || 250;
+    const initHeight = savedState?.height || DEFAULT_HEIGHT;
 
     const mainWindow = document.createElement('div');
     mainWindow.id = 'martin-duck-window';
     mainWindow.style.cssText = `position: fixed; top: ${initTop}; ${initLeft ? `left: ${initLeft};` : 'right: 20px;'} width: ${initWidth}px; height: ${initHeight}px; background: #312e2b; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 999999; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #fff; overflow: hidden;`;
+    windowState.width = initWidth;
+    windowState.height = initHeight;
 
     const titleBar = document.createElement('div');
     titleBar.style.cssText = `background: #262421; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; user-select: none; border-bottom: 1px solid rgba(255,255,255,0.1);`;
@@ -798,6 +812,33 @@
 
     makeDraggable(titleBar, mainWindow);
     makeResizable(mainWindow);
+
+    (function monitorBoardChanges() {
+        let observer = null;
+        function attachObserver() {
+            const board = document.querySelector('.board, wc-chess-board, chess-board');
+            if (!board) return false;
+            observer = new MutationObserver(() => {
+                if (!lastArrowFen) return;
+                const fen = getFEN();
+                if (fen && fen !== lastArrowFen) {
+                    clearArrowsAndList();
+                }
+            });
+            observer.observe(board, { childList: true, subtree: true, attributes: true });
+            return true;
+        }
+        if (!attachObserver()) {
+            const retry = setInterval(() => {
+                if (attachObserver()) clearInterval(retry);
+            }, 500);
+        }
+        setInterval(() => {
+            if (!lastArrowFen) return;
+            const fenNow = getFEN();
+            if (fenNow && fenNow !== lastArrowFen) clearArrowsAndList();
+        }, 300);
+    })();
 
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.shiftKey && e.key === 'A') {

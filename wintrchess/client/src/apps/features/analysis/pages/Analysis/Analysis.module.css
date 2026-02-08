@@ -32,6 +32,26 @@
     color: #9aa3b5;
 }
 
+.chessComBtn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: #769656;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: fit-content;
+}
+
+.chessComBtn:hover {
+    background: #5d7a42;
+}
+
 .analysisSection {
     display: flex;
     flex-wrap: wrap;

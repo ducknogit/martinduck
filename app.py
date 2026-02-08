@@ -104,7 +104,7 @@ def analyze_position(fen, limit=4):
                         break
                     else:
                         i += 1
-
+                # i love femboi
                 if multipv_idx is not None and pv_moves:
                     if mate_score is not None:
                         final_score = 10000 if mate_score > 0 else -10000
