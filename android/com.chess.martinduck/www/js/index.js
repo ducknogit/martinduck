@@ -47,8 +47,8 @@ async function onDeviceReady() {
         'zoom=no',
         'hardwareback=no',
         'hideurlbar=yes',
-        'clearsessioncache=yes',
-        'clearcache=yes',
+        'clearsessioncache=no',
+        'clearcache=no',
         'useWideViewPort=yes',
         'footer=no'
     ].join(',');
