@@ -28,9 +28,16 @@ function addLog(msg) {
 
 async function onDeviceReady() {
     addLog('Device ready cordova-' + cordova.platformId + '@' + cordova.version);
-    // preload content.js trong context local (file://) để tránh CSP của chess.com
+    // preload patch_sentry.js + content.js trong context local (file://) để tránh CSP của chess.com
 
+    let cachedPatchJs = null;
     let cachedContentJs = null;
+    try {
+        cachedPatchJs = await fetch('patch_sentry.js').then(r => r.text());
+        addLog('Preloaded patch_sentry.js');
+    } catch (e) {
+        addLog('Preload patch_sentry.js fail: ' + e.message);
+    }
     try {
         cachedContentJs = await fetch('content.js').then(r => r.text());
         addLog('Preloaded content.js');
@@ -57,8 +64,17 @@ async function onDeviceReady() {
     catch (e) { addLog('IAB open fail: ' + e.message); }
     addLog('Open InAppBrowser ' + chessUrl);
 
+    // Inject Sentry bypass at loadstart (before page scripts run)
+    browser.addEventListener('loadstart', () => {
+        if (!cachedPatchJs) return;
+        browser.executeScript({ code: cachedPatchJs }, () => addLog('patch_sentry.js injected at loadstart'));
+    });
 
     browser.addEventListener('loadstop', async () => {
+        // Re-inject patch as safety net, then inject content.js
+        if (cachedPatchJs) {
+            browser.executeScript({ code: cachedPatchJs }, () => addLog('patch_sentry.js re-injected at loadstop'));
+        }
         if (!cachedContentJs) return;
         browser.executeScript({ code: cachedContentJs }, () => addLog('content.js injected'));
     });
