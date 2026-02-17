@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Ducknovis
+# Licensed under the MIT License. See LICENSE file in the project root for full license information.
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import subprocess
